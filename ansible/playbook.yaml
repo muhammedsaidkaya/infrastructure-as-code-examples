@@ -1,0 +1,17 @@
+---
+
+- hosts: k8s
+  become: yes
+  roles:
+    - k8s
+
+- hosts: masters
+  become: yes
+  gather_facts: false
+  roles:
+    - master
+
+- hosts: workers
+  become: yes
+  roles:
+    - worker

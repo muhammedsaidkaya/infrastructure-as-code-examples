@@ -8,13 +8,3 @@ resource "aws_subnet" "packer-public-subnet-test" {
     Name = "muhammed_public_subnet"
   }
 }
-
-resource "aws_subnet" "packer-private-subnet-test" {
-  vpc_id            = aws_vpc.packer-vpc-test.id
-  cidr_block        = "172.16.11.0/24"
-  availability_zone = "us-west-2a"
-  
-  tags = {
-    Name = "muhammed_private_subnet"
-  }
-}

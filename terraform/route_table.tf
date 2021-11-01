@@ -15,11 +15,3 @@ resource "aws_route_table" "packer-public_rt-test" {
     Name = "muhammed_public_rt"
   }
 }
-
-resource "aws_route_table" "packer-private-rt-test" {
-  vpc_id = aws_vpc.packer-vpc-test.id
-
-  tags = {
-    Name = "muhammed_private_rt"
-  }
-}

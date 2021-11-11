@@ -1,0 +1,23 @@
+- name: init cluster
+  shell: kubeadm init --v=5 >> cluster_initialized.txt
+  args:
+    chdir: $HOME
+    creates: cluster_initialized.txt
+
+
+- name: Create a directory if it does not exist
+  file:
+    path: $HOME/.kube/
+    state: directory
+    mode: '0755'
+
+
+- name: Copy admin conf to .kube/config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: $HOME/.kube/config
+    remote_src: yes
+
+
+- name: network plugin installation(living on edge)
+  shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"

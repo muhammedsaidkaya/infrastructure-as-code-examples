@@ -1,0 +1,22 @@
+
+- name: Upload Files
+  copy:
+    src: .
+    dest: "{{ path }}/"
+    mode: 0644
+    directory_mode: "0755"
+
+- name: Upload Vars File
+  template:
+    src: templates/vars.tf
+    dest: "{{ path }}/"
+    mode: 0644
+
+- name: init
+  shell: "cd {{ path }}/ && terraform init"
+
+- name: validate
+  shell: "cd {{ path }}/ && terraform plan"
+
+- name: apply
+  shell: "cd {{ path }}/ && terraform apply -auto-approve"

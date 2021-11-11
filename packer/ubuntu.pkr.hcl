@@ -9,7 +9,7 @@ packer {
 
 variable "ami_prefix" {
   type    = string
-  default = "packer-ubuntu-docker-kubeadm"
+  default = "packer-ubuntu-docker"
 }
 
 locals {

@@ -1,0 +1,29 @@
+---
+
+- name: Upload Files
+  copy:
+    src: ubuntu.pkr.hcl
+    dest: "{{ path }}/"
+    mode: 0644
+    directory_mode: "0755"
+
+# - name: aws
+#   shell: "export AWS_PROFILE={{ AWS_PROFILE }}"
+
+- name: init
+  shell: "packer init {{ path }}/ubuntu.pkr.hcl"
+
+- name: validate
+  shell: "packer validate {{ path }}/ubuntu.pkr.hcl"
+
+- name: create image
+  shell: packer build {{ path }}/ubuntu.pkr.hcl 2>&1 | sudo tee output.txt
+
+- name: get ami_id
+  shell: tail -2 output.txt | head -2 | awk 'match($0, /ami-.*/) { print substr($0, RSTART, RLENGTH) }'
+  register: ami_id
+
+- name: set ami_id
+  set_fact:
+    ami_id: "{{ ami_id.stdout_lines[0] }}"
+

@@ -15,7 +15,7 @@ variable "ec2_k8s_node_type" {
 
 variable "ec2_k8s_node_ami_id" {
   type = string
-  default = "ami-036d46416a34a611c"
+  default = "{{ AMI_ID }}"
 }
 
 variable "ec2_count" {

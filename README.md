@@ -1,11 +1,10 @@
 
-## How to setup your k8s cluster with kubeadm on AWS (Ubuntu-20.04LTS)
+## How to Setup K8s cluster 
 
 ### Packer - AMI Creation
 ```
-#!/bin/bash
 
-cd packer
+cd packer-jump-rke-ansible
 
 packer init
 packer validate .
@@ -15,7 +14,7 @@ packer build .
 
 ### Terraform - Provisioning
 ```
-cd ../terraform
+cd terraform-cluster
 
 #Update vars.tf, change ec2_k8s_node_ami_id
 
@@ -25,9 +24,9 @@ terraform apply
 
 ```
 
-### Ansible - Configuration - K8s Cluter Setup
+### Ansible - Configuration - Vanilla K8s Cluter Setup
 ```
-cd ../ansible
+cd ansible-kubeadm-cluster
 
 #Update host.ini, fill the blanks with master and worker nodes ip addresses
 

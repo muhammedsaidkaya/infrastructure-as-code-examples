@@ -51,7 +51,7 @@
 - name: systemctl daemon reload
   shell: systemctl daemon-reload
 
-- name: Start service kubelet
+- name: Start service docker
   ansible.builtin.service:
     name: docker
     state: started

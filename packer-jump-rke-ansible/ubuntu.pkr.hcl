@@ -9,7 +9,7 @@ packer {
 
 variable "ami_prefix" {
   type    = string
-  default = "packer-ubuntu-docker"
+  default = "ubuntu-jump-rke-ansible"
 }
 
 locals {
@@ -40,12 +40,29 @@ build {
 
   provisioner "shell" {
     inline = [
-      "echo test"
+      "sudo apt-get update",
+      "sudo apt-get install build-essential aptitude -y",
+      "sudo aptitude install python3-pip -y",
+      "pip3 install ansible",
+      "pip3 install Jinja2 --upgrade",
+      "sudo echo 'export PATH=$PATH:/home/ubuntu/.local/bin' >> /home/ubuntu/.bash_profile"
     ]
   }
 
   provisioner "shell" {
-    inline = ["echo This provisioner runs last"]
+    inline = [
+      "sudo git clone https://github.com/kloia/rke-ansible.git"
+    ]
+  }
+
+  provisioner "shell" {
+    inline = [
+      "curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -",
+      "sudo apt-get install apt-transport-https --yes",
+      "echo 'deb https://baltocdn.com/helm/stable/debian/ all main' | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list",
+      "sudo apt-get update",
+      "sudo apt-get install helm",
+    ]
   }
 }
 

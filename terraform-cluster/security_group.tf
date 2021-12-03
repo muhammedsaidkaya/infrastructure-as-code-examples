@@ -1,7 +1,7 @@
-resource "aws_security_group" "allow_web" {
+resource "aws_security_group" "this" {
   name        = "allow_web_traffic"
   description = "Allow Web inbound traffic"
-  vpc_id      = aws_vpc.packer-vpc-test.id
+  vpc_id      = aws_vpc.this.id
 
   ingress {
     from_port   = 0
@@ -19,6 +19,6 @@ resource "aws_security_group" "allow_web" {
   }
 
   tags = {
-    Name = "muhamed_allow_all"
+    Name = "${var.resource_prefix}-${terraform.workspace}-allow-all"
   }
 }

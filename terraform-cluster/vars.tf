@@ -7,36 +7,40 @@ variable "profile" {
   default = "default"
 }
 variable "ec2_type" {
-  type = string
+  type    = string
   default = "t3.large"
 }
 variable "ec2_volume_size" {
-  type = number
+  type    = number
   default = 16
 }
 variable "ec2_volume_type" {
-  type = string
+  type    = string
   default = "gp2"
 }
 variable "ami_id" {
-  type = string
+  type    = string
   default = "ami-0f81e6e71078b75b6"
 }
 
 variable "ec2_count" {
-  type = number
-  default = 4
+  type    = number
+  default = 3
+  validation {
+    condition     = var.ec2_count > 2
+    error_message = "The ec2_count value must be minimum 3."
+  }
 }
 variable "PUBLIC_KEY_PATH" {
   type    = string
   default = "~/.ssh/id_rsa.pub"
 }
 variable "resource_prefix" {
-  type = string
+  type    = string
   default = "muhammed"
 }
 variable "vpc_cidr" {
-  type = string
+  type    = string
   default = "172.16.0.0/16"
 }
 

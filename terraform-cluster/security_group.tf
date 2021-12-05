@@ -1,7 +1,7 @@
-resource "aws_security_group" "this" {
+resource "aws_security_group" "sg_allow_all" {
   name        = "allow_web_traffic"
   description = "Allow Web inbound traffic"
-  vpc_id      = aws_vpc.this.id
+  vpc_id      = aws_vpc.vpc_main.id
 
   ingress {
     from_port        = 0
@@ -23,10 +23,10 @@ resource "aws_security_group" "this" {
   }
 }
 
-resource "aws_security_group" "jump" {
+resource "aws_security_group" "sg_allow_ssh" {
   name        = "allow_ssh"
   description = "Allow SSH Traffic"
-  vpc_id      = aws_vpc.this.id
+  vpc_id      = aws_vpc.vpc_main.id
 
   ingress {
     from_port        = 22

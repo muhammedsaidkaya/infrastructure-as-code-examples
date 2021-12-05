@@ -3,9 +3,9 @@ resource "aws_instance" "this" {
   ami                         = var.ami_id
   instance_type               = var.ec2_type
   associate_public_ip_address = true
-  security_groups             = [aws_security_group.this.id]
+  security_groups             = [aws_security_group.sg_allow_all.id]
   key_name                    = aws_key_pair.this.id
-  subnet_id                   = aws_subnet.this[keys(aws_subnet.this)[count.index % length(data.aws_availability_zones.available.names)]].id
+  subnet_id                   = aws_subnet.subnet_public[keys(aws_subnet.subnet_public)[count.index % length(data.aws_availability_zones.available.names)]].id
 
   tags = {
     "Desired-State" = "Ignore"
@@ -21,8 +21,8 @@ resource "aws_instance" "jump" {
   ami                         = var.ami_id
   instance_type               = var.ec2_type
   associate_public_ip_address = true
-  security_groups             = [aws_security_group.jump.id]
-  subnet_id                   = aws_subnet.jump.id
+  security_groups             = [aws_security_group.sg_allow_ssh.id]
+  subnet_id                   = aws_subnet.subnet_private.id
   key_name                    = aws_key_pair.this.id
 
   tags = {

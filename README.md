@@ -70,10 +70,6 @@ kubectl create namespace cattle-system
 ### Create cert-manager for self-signing certificates
 ```
 kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.crds.yaml
-```
-
-### Install HELM
-```
 curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
 sudo apt-get install apt-transport-https --yes
 echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
@@ -104,7 +100,6 @@ kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='{{
 
 ## Vault Setup
 
-### Vault Install-Persistent Volume Create
 ```
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
@@ -144,7 +139,7 @@ VAULT_UNSEAL_KEY=$(cat cluster-keys.json | jq -r ".unseal_keys_b64[]")
 kubectl exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
 ```
 
-#### Vault Loging
+#### Vault Logging
 ```
 cat cluster-keys.json | jq -r ".root_token"
 kubectl exec --stdin=true --tty=true vault-0 -- /bin/sh

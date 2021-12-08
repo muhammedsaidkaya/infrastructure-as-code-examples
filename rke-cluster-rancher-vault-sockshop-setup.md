@@ -36,25 +36,33 @@ sh provision.sh
 ```
 
 ## Create Namespace 
+```
 kubectl create namespace cattle-system
+```
 
 ## Create cert-manager for self-signing certificates
+```
 kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.crds.yaml
+```
 
 ## Install HELM
+```
 curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
 sudo apt-get install apt-transport-https --yes
 echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 sudo apt-get update
 sudo apt-get install helm
+```
 
 ## Create cert-manager
+```
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --create-namespace \
   --version v1.5.1
+```
 
 ## Create rancher
 Note: Update hostname variable with your public ip. After installation, Go to your host and enter the password.
@@ -74,7 +82,7 @@ kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='{{
 #https://hub.docker.com/layers/mysql/library/mysql/latest/images/sha256-eb791004631abe3bf842b3597043318d19a91e8c86adca55a5f6d4d7b409f2ac?context=explore
 
 # Vault Install-Persistent Volume Create
-
+```
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
 cat <<EOF > helm-vault-values.yml
@@ -99,7 +107,7 @@ spec:
     path: /tmp
 EOF
 kubectl apply -f pv.yml
-
+```
 
 # Vault Unseal-Login Part
 

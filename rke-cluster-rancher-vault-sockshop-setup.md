@@ -75,11 +75,11 @@ kubectl -n cattle-system get deploy rancher
 kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='{{ .data.bootstrapPassword|base64decode}}{{ "\n" }}'
 ```
 
-# VAULT KURULUMU
-#https://learn.hashicorp.com/tutorials/vault/kubernetes-minikube
-#https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar
-#https://stackoverflow.com/questions/61239479/injecting-vault-secrets-into-kubernetes-pod-environment-variable
-#https://hub.docker.com/layers/mysql/library/mysql/latest/images/sha256-eb791004631abe3bf842b3597043318d19a91e8c86adca55a5f6d4d7b409f2ac?context=explore
+# VAULT Installation
+https://learn.hashicorp.com/tutorials/vault/kubernetes-minikube
+https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar
+https://stackoverflow.com/questions/61239479/injecting-vault-secrets-into-kubernetes-pod-environment-variable
+https://hub.docker.com/layers/mysql/library/mysql/latest/images/sha256-eb791004631abe3bf842b3597043318d19a91e8c86adca55a5f6d4d7b409f2ac?context=explore
 
 # Vault Install-Persistent Volume Create
 ```

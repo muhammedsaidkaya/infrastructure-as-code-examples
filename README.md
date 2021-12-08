@@ -139,7 +139,7 @@ VAULT_UNSEAL_KEY=$(cat cluster-keys.json | jq -r ".unseal_keys_b64[]")
 kubectl exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
 ```
 
-#### Vault Logging
+#### Vault Login
 ```
 cat cluster-keys.json | jq -r ".root_token"
 kubectl exec --stdin=true --tty=true vault-0 -- /bin/sh

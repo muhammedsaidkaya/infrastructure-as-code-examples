@@ -187,7 +187,7 @@ vault write auth/kubernetes/role/sockshop-role \
 ```
 kubectl create ns sock-shop
 kubectl config set-context --current --namespace=sock-shop
-kubectl create ns sockshop-sa
+kubectl create sa sockshop-sa
 ```
 
 ## SockShop App Setup

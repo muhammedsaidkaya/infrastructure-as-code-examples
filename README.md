@@ -14,9 +14,9 @@ packer build .
 
 ### Terraform - Provisioning
 ```
-cd terraform-cluster
+cd terraform-all-public
 
-#Update vars.tf, change ec2_k8s_node_ami_id
+#Update vars.tf, change ami_id
 
 terraform init
 terraform plan
@@ -33,6 +33,10 @@ cd ansible-kubeadm-cluster
 ansible-playbook playbook.yaml -i hosts.ini --private-key ~/.ssh/id_rsa -u ubuntu
 
 ```
+
+### RKE Cluster-Rancher-Vault Setup
+
+rke-cluster-rancher-vault-sockshop-setup.md
 
 ## Resources
 * k8s setup: https://github.com/sipirsipirmin/k8s-on-ubuntu

@@ -1,0 +1,44 @@
+- name: Get stats of the rke-repo
+  ansible.builtin.stat:
+    path: /home/ubuntu/rke-ansible
+  register: sym
+
+- name: Clone kloia rke-ansible repo - master branch
+  git:
+    repo: https://github.com/kloia/rke-ansible.git
+    dest: rke-ansible
+    single_branch: yes
+    version: master
+  when: sym.stat.islnk is not defined
+
+- name: Replace ip addresses
+  lineinfile:
+    path: rke-ansible/vars/general-config.yml
+    regexp: '^{{ item }}'
+    line: "{{ item }}: {{ ip[my_idx] }}"
+  loop:
+     - node1_ip
+     - node2_ip
+     - node3_ip
+  loop_control:
+    index_var: my_idx
+  when: sym.stat.islnk is not defined
+
+- name: Replace ssh key path
+  lineinfile:
+    path: rke-ansible/vars/general-config.yml
+    regexp: '^ssh_key_path'
+    line: "ssh_key_path: {{ ssh_key_path_remote }}"
+  when: sym.stat.islnk is not defined
+
+- name: Run provision script
+  shell: . ~/.profile && sh provision.sh
+  args:
+    chdir: rke-ansible/
+
+- name: Changing perm of config
+  file: 
+    dest: /home/ubuntu/.kube/config 
+    mode: 0400
+
+- include: config.yaml

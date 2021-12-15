@@ -1,0 +1,10 @@
+---
+- name: Create cattle-system namespace
+  shell: kubectl create namespace cattle-system
+
+- name: Create cert-manager CRDs  
+  shell: kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.crds.yaml
+
+- include: helm.yaml
+- include: cert_manager.yaml
+- include: rancher.yaml

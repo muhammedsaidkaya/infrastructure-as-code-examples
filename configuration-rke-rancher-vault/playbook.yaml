@@ -1,0 +1,19 @@
+---
+- hosts: jump
+  become: yes
+  tasks:
+    - name: copy ssh key
+      copy:
+        src: "{{ ssh_key_path_local }}"
+        dest: "{{ ssh_key_path_remote }}"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0400'
+
+- hosts: jump
+  roles:
+    - packages
+    - rke_ansible
+    - rancher
+    - vault
+    - sockshop

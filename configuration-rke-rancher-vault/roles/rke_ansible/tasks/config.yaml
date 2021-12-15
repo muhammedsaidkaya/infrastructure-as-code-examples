@@ -1,0 +1,18 @@
+---
+- name: Download RKE kubeconfig to localhost
+  ansible.builtin.fetch:
+    src: /home/ubuntu/.kube/config
+    dest: ../rke_config
+    flat: yes
+  run_once: true
+  when:
+  - download_kubeconf
+
+# - name: Replace loopback IP by master server IP
+#   ansible.builtin.replace:
+#     path: ../rke_config
+#     regexp: '{{ ip[2] }}'
+#     replace: "{{ rancher_hostname | default(hostvars[groups.jump.0]['ansible_default_ipv4']['address']) }}"
+#   delegate_to: localhost
+#   when:
+#   - download_kubeconf

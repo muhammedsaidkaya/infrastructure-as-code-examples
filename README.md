@@ -5,7 +5,7 @@
 git clone https://github.com/muhammedsaidkaya/k8s-cluster-rancher-vault-setup
 ```
 
-## Packer - AMI Creation for Bastion Host (Optional - Skip it)
+## Packer - AMI Creation for Bastion Host
 ```
 cd packer-jump-rke-ansible
 packer init
@@ -15,14 +15,34 @@ packer build .
 
 ## Terraform - High Available Provisioning 
 ```
-cd terraform-all-public
+cd provisioning
 export TF_VAR_ec2_count=4
 terraform init
 terraform plan -out 'tfplan'
 terraform apply 'tfplan'
 ```
 
-## Copy SSH Key to Bastion Host
+## Ansible - Vanilla Cluster Configuration Management
+```
+cd configuration-vanilla-cluster
+#Update host.ini, fill the blanks with master and worker nodes ip addresses
+vi hosts.ini
+ansible-playbook playbook.yaml
+```
+
+## Ansible - RKE-Rancher Configuration Management
+```
+cd configuration-rke-rancher-vault
+#Update host.ini with jump ip
+vi hosts.ini
+#Update group_vars/all.yaml with private ips of nodes and rancher hostname
+vi group_vars/all.yaml
+ansible-playbook playbook.yaml 
+```
+
+## Manual - RKE-Rancher Configuration Management
+
+### Copy SSH Key to Bastion Host
 
 ```
 ssh ubuntu@{jump-ec2-public-ip}
@@ -30,9 +50,9 @@ vi /tmp/id_rsa
 chmod 400 /tmp/id_rsa
 ```
 
-## Ansible - K8s Cluster Setup (Run on Bastion Host)
+### Ansible - K8s Cluster Setup (Run on Bastion Host)
 
-### Install Ansible 
+#### Install Ansible 
 ```
 sudo apt-get update
 sudo apt install python3-pip --yes
@@ -41,16 +61,7 @@ pip3 install Jinja2 --upgrade
 export PATH="$(python3 -m site --user-base)/bin":$PATH
 ```
 
-### Vanilla Cluster
-
-```
-cd k8s-cluster-rancher-vault-setup/ansible-kubeadm-cluster
-#Update host.ini, fill the blanks with master and worker nodes ip addresses
-vi host.ini
-ansible-playbook playbook.yaml -i hosts.ini --private-key /tmp/id_rsa -u ubuntu
-```
-
-### RKE Cluster 
+#### RKE Cluster 
 
 ```
 git clone https://github.com/kloia/rke-ansible.git
@@ -60,14 +71,14 @@ vi vars/general-config.yml
 sh provision.sh
 ```
 
-## Rancher Setup
+### Rancher Setup
 
-### Create Namespace 
+#### Create Namespace 
 ```
 kubectl create namespace cattle-system
 ```
 
-### Create cert-manager for self-signing certificates
+#### Create cert-manager for self-signing certificates
 ```
 kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.crds.yaml
 curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
@@ -77,7 +88,7 @@ sudo apt-get update
 sudo apt-get install helm
 ```
 
-### Install cert-manager
+#### Install cert-manager
 ```
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
@@ -87,7 +98,7 @@ helm install cert-manager jetstack/cert-manager \
   --version v1.5.1
 ```
 
-### Install rancher with Helm
+#### Install rancher with Helm
 Note: Update hostname variable with your public ip. After installation, Go to your host and enter the password.
 ```
 helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
@@ -98,7 +109,7 @@ kubectl -n cattle-system get deploy rancher
 kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='{{ .data.bootstrapPassword|base64decode}}{{ "\n" }}'
 ```
 
-## Vault Setup
+### Vault Setup
 
 ```
 helm repo add hashicorp https://helm.releases.hashicorp.com
@@ -127,9 +138,9 @@ EOF
 kubectl apply -f pv.yml
 ```
 
-### Vault Unseal-Login Part
+#### Vault Unseal-Login Part
 
-#### Unseal Vault
+##### Unseal Vault
 
 ```
 kubectl exec vault-0 -- vault operator init -key-shares=1 -key-threshold=1 -format=json > cluster-keys.json
@@ -139,7 +150,7 @@ VAULT_UNSEAL_KEY=$(cat cluster-keys.json | jq -r ".unseal_keys_b64[]")
 kubectl exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
 ```
 
-#### Vault Login
+##### Vault Login
 ```
 cat cluster-keys.json | jq -r ".root_token"
 kubectl exec --stdin=true --tty=true vault-0 -- /bin/sh
@@ -147,15 +158,15 @@ vault login
 vault secrets enable -path=secret kv-v2
 ```
 
-## Vault ServiceAccount-Policy-Role-Namespace Config for K8s
+### Vault ServiceAccount-Policy-Role-Namespace Config for K8s
 
-### Store Secrets
+#### Store Secrets
 ```
 vault kv put sockshop/database/config db="socksdb" password="fake_password"
 vault kv get sockshop/database/config
 ```
 
-### Enable K8s
+#### Enable K8s
 ```
 vault auth enable kubernetes
 vault write auth/kubernetes/config \
@@ -165,7 +176,7 @@ vault write auth/kubernetes/config \
         issuer="https://kubernetes.default.svc.cluster.local"
 
 ```
-### Create Policy
+#### Create Policy
 ``` 
 vault policy write sockshop-role - <<EOF
 path "sockshop/data/database/config" {
@@ -174,7 +185,7 @@ path "sockshop/data/database/config" {
 EOF
 ```
 
-### Create ROLE
+#### Create ROLE
 ```
 vault write auth/kubernetes/role/sockshop-role \
         bound_service_account_names=sockshop-sa \
@@ -183,20 +194,20 @@ vault write auth/kubernetes/role/sockshop-role \
         ttl=24h
 ```
 
-### Create Namespace-ServiceAccount
+#### Create Namespace-ServiceAccount
 ```
 kubectl create ns sock-shop
 kubectl config set-context --current --namespace=sock-shop
 kubectl create sa sockshop-sa
 ```
 
-## SockShop App Setup
+### SockShop App Setup
 
 ```
 git clone https://github.com/microservices-demo/microservices-demo/
 cd micoservices-demo/deploy/kubernetes/manifests
 ```
-### Creating Secret file with Vault-Agent and Exporting Environment Variables
+#### Creating Secret file with Vault-Agent and Exporting Environment Variables
 ```
 cat <<EOF > 07-catalogue-db-dep.yaml 
 ---
@@ -238,7 +249,7 @@ spec:
         beta.kubernetes.io/os: linux
 EOF
 ```
-### Deploying SockShop Application
+#### Deploying SockShop Application
 ```
 kubectl apply -f .
 ```

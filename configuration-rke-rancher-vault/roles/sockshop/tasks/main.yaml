@@ -1,0 +1,53 @@
+---
+- name: Store secrets
+  shell: kubectl exec -it vault-0 -- sh -c 'vault kv put secret/sockshop/database/config db="socksdb" password="fake_password"'
+
+- name: Create policy
+  shell: |
+    kubectl exec -it vault-0 -- sh -c 'vault policy write sockshop-policy - <<EOF
+    path "secret/data/sockshop/database/config" {
+      capabilities = ["read"]
+    }
+    EOF'
+
+- name: Create role
+  shell: |
+    kubectl exec -it vault-0 -- sh -c 'vault write auth/kubernetes/role/sockshop-role \
+        bound_service_account_names=sockshop-sa \
+        bound_service_account_namespaces=sock-shop \
+        policies=sockshop-policy \
+        ttl=24h'
+
+- name: Create namespace
+  shell: kubectl create ns sock-shop
+
+- name: Create serviceAccount
+  shell: kubectl create sa sockshop-sa -n sock-shop
+
+- name: Clone sockshop repo - master branch
+  git:
+    repo: https://github.com/microservices-demo/microservices-demo.git
+    dest: microservices-demo
+    single_branch: yes
+    version: master
+
+- name: Delete content & directory
+  file:
+    state: absent
+    path: "/home/ubuntu/microservices-demo/deploy/kubernetes/manifests/07-catalogue-db-dep.yaml"
+
+- name: Get stats of the db config
+  ansible.builtin.stat:
+    path: /home/ubuntu/microservices-demo/deploy/kubernetes/manifests/db.yaml
+  register: dbconfig
+
+- name: Copy db confiuration file with owner and permissions
+  copy:
+    src: db
+    dest: /home/ubuntu/microservices-demo/deploy/kubernetes/manifests/db.yaml
+  when: dbconfig.stat.islnk is not defined
+
+- name: Apply k8s configurations
+  shell: kubectl apply -f .
+  args:
+    chdir: /home/ubuntu/microservices-demo/deploy/kubernetes/manifests

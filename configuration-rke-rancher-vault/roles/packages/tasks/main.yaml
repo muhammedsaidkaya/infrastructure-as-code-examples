@@ -1,0 +1,29 @@
+---
+- name: Apt update
+  become: yes
+  apt:
+    name: "*"
+    state: latest
+
+- name: Install python3-pip
+  become: yes
+  apt:
+    name: python3-pip
+    state: present
+    update_cache: yes
+
+- name: Install ansible python package
+  pip:
+    name: ansible
+
+- name: Install openshift python package
+  pip:
+    name: openshift
+
+- name: install the Jinja2 package, force upgrade
+  pip: 
+    name: Jinja2
+    state: latest
+
+- name: Update path environment varaible
+  shell: 'echo PATH="$(python3 -m site --user-base)/bin":$PATH >> .profile && . ~/.profile'

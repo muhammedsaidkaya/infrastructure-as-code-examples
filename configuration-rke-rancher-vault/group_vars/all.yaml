@@ -1,0 +1,8 @@
+ip:
+- ""
+- ""
+- ""
+ssh_key_path_local: "../keys/id_rsa"
+ssh_key_path_remote: "/tmp/id_rsa"
+rancher_hostname: ".sslip.io"
+download_kubeconf: false

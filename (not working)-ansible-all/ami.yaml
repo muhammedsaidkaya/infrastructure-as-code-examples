@@ -1,4 +1,0 @@
-- hosts: localhost
-  become: yes
-  roles:
-    - { role: roles/packer }

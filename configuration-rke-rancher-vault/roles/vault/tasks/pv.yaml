@@ -1,0 +1,29 @@
+---
+- name: Get an existing PV object
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: PersistentVolume
+    name: pv0003
+  register: pv
+
+- name: addresses
+  debug:
+    msg: "{{ pv }}"
+
+- name: Create Persistent Volume
+  shell: |
+    cat <<EOF | kubectl apply -f -
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: pv0003
+    spec:
+      capacity:
+        storage: 10Gi
+      volumeMode: Filesystem
+      accessModes:
+        - ReadWriteOnce
+      hostPath:
+        path: /tmp
+    EOF
+  when: pv is not defined

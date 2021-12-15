@@ -1,0 +1,17 @@
+---
+- name: Add Vault chart repo
+  kubernetes.core.helm_repository:
+    name: hashicorp
+    repo_url: "https://helm.releases.hashicorp.com"
+
+- name: Deploy vault chart
+  kubernetes.core.helm:
+    name: vault
+    chart_ref: hashicorp/vault
+    release_namespace: default
+    update_repo_cache: True
+    values:
+      enabled: false
+
+- include: pv.yaml
+- include: unseal.yaml

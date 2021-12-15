@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogue-db
+  labels:
+    name: catalogue-db
+  namespace: sock-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: catalogue-db
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'sockshop-role'
+        vault.hashicorp.com/agent-inject-secret-database-config.txt: 'secret/data/sockshop/database/config'
+        vault.hashicorp.com/agent-inject-template-database-config.txt: |
+          {{- with secret "secret/data/sockshop/database/config" -}}
+           export MYSQL_ROOT_PASSWORD={{ .Data.data.password }}
+           export MYSQL_DATABASE={{ .Data.data.db }}
+          {{- end -}}
+      labels:
+        name: catalogue-db
+    spec:
+      serviceAccountName: sockshop-sa
+      containers:
+      - name: catalogue-db
+        image: weaveworksdemos/catalogue-db:0.3.0
+        args: ['sh', '-c', '. /vault/secrets/database-config.txt && docker-entrypoint.sh mysqld']
+        ports:
+        - name: mysql
+          containerPort: 3306
+      nodeSelector:
+        beta.kubernetes.io/os: linux

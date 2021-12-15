@@ -1,0 +1,15 @@
+---
+- name: Add Rancher chart repo
+  kubernetes.core.helm_repository:
+    name: rancher-latest
+    repo_url: "https://releases.rancher.com/server-charts/latest"
+
+- name: Deploy rancher chart
+  kubernetes.core.helm:
+    name: rancher
+    chart_ref: rancher-latest/rancher
+    release_namespace: cattle-system
+    update_repo_cache: True
+    values:
+      hostname: "{{ rancher_hostname }}"
+      replicas: 3

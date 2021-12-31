@@ -178,7 +178,7 @@ vault write auth/kubernetes/config \
 ```
 #### Create Policy
 ``` 
-vault policy write sockshop-role - <<EOF
+vault policy write sockshop-policy - <<EOF
 path "sockshop/data/database/config" {
   capabilities = ["read"]
 }
